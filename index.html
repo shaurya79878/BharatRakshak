@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Emergency Helpline - Shaurya AI</title>
+    <style>
+        :root {
+            --primary-color: #e63946;
+            --secondary-color: #1d3557;
+            --accent-color: #457b9d;
+            --light-color: #f1faee;
+            --dark-color: #0d1b2a;
+            --neon-blue: #00b4d8;
+            --neon-red: #e63946;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark-color);
+            color: var(--light-color);
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://wallpapers.com/wallpapers/old-beaten-indian-flag-go8hkn52v6whyc4h.html') center/cover no-repeat;
+            opacity: 0.1;
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo h1 {
+            font-size: 28px;
+            background: linear-gradient(to right, var(--neon-red), var(--neon-blue));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-left: 15px;
+        }
+        
+        .emergency-buttons {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .emergency-button {
+            flex: 1;
+            padding: 15px;
+            border-radius: 10px;
+            border: none;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+            min-height: 100px;
+        }
+        
+        .emergency-button::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+        
+        .emergency-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .emergency-button.police {
+            background-color: #3498db;
+        }
+        
+        .emergency-button.fire {
+            background-color: #e74c3c;
+        }
+        
+        .emergency-button.medical {
+            background-color: #2ecc71;
+        }
+        
+        .emergency-button.fir {
+            background-color: #9b59b6;
+        }
+        
+        .emergency-button i {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .main-sections {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-sections {
+                grid-template-columns: 1fr;
+            }
+            
+            .emergency-buttons {
+                flex-wrap: wrap;
+            }
+            
+            .emergency-button {
+                min-width: 45%;
+            }
+        }
+        
+        .section {
+            background-color: rgba(29, 53, 87, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s;
+        }
+        
+        .section:hover {
+            transform: translateY(-5px);
+        }
+        
+        .section h2 {
+            color: var(--neon-red);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section h2 i {
+            margin-right: 10px;
+        }
+        
+        .ai-chat-box {
+            display: flex;
+            flex-direction: column;
+            height: 400px;
+        }
+        
+        .chat-messages {
+            flex-grow: 1;
+            background-color: rgba(13, 27, 42, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+        
+        .message.ai {
+            background-color: var(--accent-color);
+            align-self: flex-start;
+            border-bottom-left-radius: 0;
+        }
+        
+        .message.user {
+            background-color: var(--primary-color);
+            align-self: flex-end;
+            border-bottom-right-radius: 0;
+        }
+        
+        .chat-input {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-input input {
+            flex-grow: 1;
+            padding: 12px 15px;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background-color: rgba(13, 27, 42, 0.8);
+            color: white;
+            outline: none;
+        }
+        
+        .chat-input button {
+            padding: 12px 20px;
+            border-radius: 25px;
+            border: none;
+            background-color: var(--neon-red);
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .chat-input button:hover {
+            background-color: #c1121f;
+        }
+        
+        .voice-assistant {
+            background-color: black;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .voice-assistant h3 {
+            color: var(--neon-blue);
+            margin-bottom: 15px;
+        }
+        
+        .mic-animation {
+            width: 80px;
+            height: 80px;
+            background-color: var(--neon-red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            cursor: pointer;
+            animation: pulse 2s infinite;
+        }
+        
+        .mic-animation i {
+            font-size: 36px;
+            color: white;
+        }
+        
+        .voice-output {
+            background-color: rgba(13, 27, 42, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            min-height: 100px;
+            margin-top: 15px;
+        }
+        
+        .location-tracking {
+            position: relative;
+            height: 400px;
+            background-color: rgba(13, 27, 42, 0.8);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        .map-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('/api/placeholder/400/320') center/cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .location-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+        }
+        
+        .location-info p {
+            margin-bottom: 5px;
+        }
+        
+        .face-help-section {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .face-scanner {
+            width: 200px;
+            height: 200px;
+            border: 2px dashed var(--neon-blue);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .face-scanner::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, transparent, var(--neon-blue), transparent);
+            top: 50%;
+            left: 0;
+            animation: scan 2s infinite linear;
+        }
+        
+        .face-help-button {
+            padding: 15px 30px;
+            background-color: var(--neon-red);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .face-help-button::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+        
+        .face-help-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(230, 57, 70, 0.7);
+        }
+        
+        .neural-link {
+            background: linear-gradient(to right, #3a0ca3, #f72585);
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 20px;
+            position: relative;
+        }
+        
+        .neural-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: neural 3s infinite linear;
+            border-radius: 15px;
+        }
+        
+        .neural-link h3 {
+            color: white;
+            margin-bottom: 10px;
+        }
+        
+        .neural-link p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 15px;
+        }
+        
+        .neural-link-button {
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            padding: 20px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .emergency-numbers {
+            position: fixed;
+            top: 20px;
+            right: -300px;
+            width: 300px;
+            background-color: rgba(13, 27, 42, 0.9);
+            border-left: 3px solid var(--neon-red);
+            padding: 20px;
+            transition: right 0.3s;
+            z-index: 1000;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .emergency-numbers.active {
+            right: 0;
+        }
+        
+        .emergency-numbers h3 {
+            color: var(--neon-red);
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+        }
+        
+        .emergency-numbers ul {
+            list-style: none;
+        }
+        
+        .emergency-numbers li {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+        
+        .emergency-numbers li span {
+            font-weight: bold;
+            color: var(--neon-blue);
+        }
+        
+        .help-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background-color: var(--neon-red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 0 20px rgba(230, 57, 70, 0.5);
+        }
+        
+        .help-button i {
+            color: white;
+            font-size: 24px;
+        }
+        
+        /* Animations */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(230, 57, 70, 0.7);
+            }
+            
+            70% {
+                transform: scale(1.1);
+                box-shadow: 0 0 0 15px rgba(230, 57, 70, 0);
+            }
+            
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(230, 57, 70, 0);
+            }
+        }
+        
+        @keyframes scan {
+            0% {
+                transform: translateY(-50px);
+            }
+            
+            100% {
+                transform: translateY(200px);
+            }
+        }
+        
+        @keyframes shine {
+            0% {
+                left: -100%;
+            }
+            
+            100% {
+                left: 100%;
+            }
+        }
+        
+        @keyframes neural {
+            0% {
+                opacity: 0.3;
+            }
+            
+            50% {
+                opacity: 0.7;
+            }
+            
+            100% {
+                opacity: 0.3;
+            }
+        }
+        
+        /* Blood droplet animation */
+        .blood-drop {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #e63946;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(45deg);
+            animation: drop 4s infinite linear;
+            z-index: -1;
+            opacity: 0.7;
+        }
+        
+        @keyframes drop {
+            0% {
+                transform: rotate(45deg) translateY(0);
+                opacity: 0.7;
+            }
+            
+            70% {
+                opacity: 0.7;
+            }
+            
+            100% {
+                transform: rotate(45deg) translateY(100vh);
+                opacity: 0;
+            }
+        }
+        
+        /* 3D Microphone */
+        .microphone-3d {
+            position: fixed;
+            bottom: -50px;
+            left: -50px;
+            width: 200px;
+            height: 200px;
+            z-index: -1;
+            opacity: 0.3;
+            animation: float 5s infinite ease-in-out;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0);
+            }
+            
+            50% {
+                transform: translateY(-20px) rotate(5deg);
+            }
+            
+            100% {
+                transform: translateY(0) rotate(0);
+            }
+        }
+    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Background Flag Overlay -->
+    <div class="bg-overlay"></div>
+    
+    <!-- 3D Moving Background Elements -->
+    <div class="microphone-3d">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <g transform="translate(50 50)">
+                <!-- Microphone Base -->
+                <rect x="-15" y="10" width="30" height="5" rx="2" fill="#e63946" />
+                <!-- Microphone Stand -->
+                <rect x="-2" y="-15" width="4" height="25" fill="#e63946" />
+                <!-- Microphone Head -->
+                <ellipse cx="0" cy="-20" rx="8" ry="15" fill="#e63946" />
+                <ellipse cx="0" cy="-20" rx="6" ry="12" fill="#1d3557" />
+            </g>
+        </svg>
+    </div>
+    
+    <!-- Blood Droplets Animation -->
+    <script>
+        // Will be added dynamically
+    </script>
+    
+    <div class="container">
+        <header>
+            <div class="logo">
+                <img src="/api/placeholder/50/50" alt="Logo">
+                <h1>AI-Powered Emergency Helpline</h1>
+            </div>
+        </header>
+        
+        <div class="emergency-buttons">
+            <div class="emergency-button police" onclick="callEmergency('112')">
+                <i class="fas fa-shield-alt"></i>
+                <span>Call 112</span>
+            </div>
+            <div class="emergency-button fire" onclick="callEmergency('101')">
+                <i class="fas fa-fire"></i>
+                <span>Fire</span>
+            </div>
+            <div class="emergency-button medical" onclick="callEmergency('108')">
+                <i class="fas fa-ambulance"></i>
+                <span>Medical</span>
+            </div>
+            <div class="emergency-button fir" onclick="window.open('https://jeevanportal.com/indianstate/uttar_pradesh/district/UP_Police_e_FIR.php', '_blank')">
+                <i class="fas fa-file-alt"></i>
+                <span>File FIR</span>
+            </div>
+        </div>
+        
+        <div class="main-sections">
+            <div class="section">
+                <h2><i class="fas fa-robot"></i> Shaurya AI Assistant</h2>
+                <div class="ai-chat-box">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message ai">
+                            Hello! I'm Shaurya AI, your emergency assistant. How can I help you today?
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="userMessage" placeholder="Describe your emergency situation...">
+                        <button onclick="sendMessage()">Submit</button>
+                    </div>
+                </div>
+                
+                <div class="voice-assistant">
+                    <h3>Voice Assistant</h3>
+                    <div class="mic-animation" onclick="startVoiceRecognition()">
+                        <i class="fas fa-microphone"></i>
+                    </div>
+                    <p>Click the microphone and speak</p>
+                    <div class="voice-output" id="voiceOutput">
+                        Your voice assistant responses will appear here
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2><i class="fas fa-map-marker-alt"></i> Live Location Tracking</h2>
+                <div class="location-tracking">
+                    <div class="map-placeholder">
+                        <i class="fas fa-map-marked-alt" style="font-size: 48px; color: var(--neon-blue); margin-bottom: 15px;"></i>
+                        <p>Detecting your location...</p>
+                    </div>
+                    <div class="location-info">
+                        <p><strong>Current Location:</strong> <span id="currentLocation">Detecting...</span></p>
+                        <p><strong>Nearest Police Station:</strong> <span id="nearestPolice">Searching...</span></p>
+                        <p><strong>Nearest Hospital:</strong> <span id="nearestHospital">Searching...</span></p>
+                    </div>
+                </div>
+                
+                <div class="face-help-section">
+                    <h3>Face Recognition Emergency Help</h3>
+                    <div class="face-scanner" id="faceScanner">
+                        <i class="fas fa-user" style="font-size: 64px; color: var(--neon-blue);"></i>
+                    </div>
+                    <button class="face-help-button" onclick="activateFaceHelp()">FACE HELP</button>
+                </div>
+                
+                <div class="neural-link">
+                    <h3><i class="fas fa-brain"></i> Neural-Link Brainwave SOS</h3>
+                    <p>Ultra-futuristic emergency detection via brainwave analysis</p>
+                    <button class="neural-link-button" onclick="activateNeuralLink()">Activate Neural Link</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Emergency Numbers Sidebar -->
+    <div class="emergency-numbers" id="emergencyNumbers">
+        <h3>Emergency Contact Numbers</h3>
+        <ul>
+            <li><span>National Emergency Number:</span> 112</li>
+            <li><span>Police:</span> 100</li>
+            <li><span>Fire:</span> 101</li>
+            <li><span>Ambulance:</span> 108</li>
+            <li><span>Women Helpline:</span> 1091</li>
+            <li><span>Child Helpline:</span> 1098</li>
+            <li><span>Senior Citizen Helpline:</span> 14567</li>
+            <li><span>Road Accident Emergency:</span> 1073</li>
+            <li><span>Railway Accident:</span> 1072</li>
+            <li><span>Disaster Management:</span> 108</li>
+            <li><span>COVID-19 Helpline:</span> 1075</li>
+        </ul>
+    </div>
+    
+    <!-- Help Button -->
+    <div class="help-button" onclick="toggleEmergencyNumbers()">
+        <i class="fas fa-phone-alt"></i>
+    </div>
+    
+    <footer>
+        <p>&copy; 2025 AI-Powered Emergency Helpline. All rights reserved.</p>
+    </footer>
+    
+    <script>
+        // Create blood droplets animation
+        function createBloodDrops() {
+            for (let i = 0; i < 10; i++) {
+                const drop = document.createElement('div');
+                drop.className = 'blood-drop';
+                drop.style.left = Math.random() * window.innerWidth + 'px';
+                drop.style.animationDelay = Math.random() * 5 + 's';
+                document.body.appendChild(drop);
+            }
+        }
+        createBloodDrops();
+        
+        // Toggle emergency numbers sidebar
+        function toggleEmergencyNumbers() {
+            const sidebar = document.getElementById('emergencyNumbers');
+            sidebar.classList.toggle('active');
+        }
+        
+        // Simulated AI chat functionality
+        function sendMessage() {
+            const userInput = document.getElementById('userMessage');
+            const chatMessages = document.getElementById('chatMessages');
+            
+            if (userInput.value.trim() === '') return;
+            
+            // Add user message
+            const userMessage = document.createElement('div');
+            userMessage.className = 'message user';
+            userMessage.textContent = userInput.value;
+            chatMessages.appendChild(userMessage);
+            
+            // Simulate thinking
+            setTimeout(() => {
+                // Add AI response (simulated)
+                const aiResponse = getAIResponse(userInput.value);
+                const aiMessage = document.createElement('div');
+                aiMessage.className = 'message ai';
+                aiMessage.textContent = aiResponse;
+                chatMessages.appendChild(aiMessage);
+                
+                // Scroll to bottom
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 1000);
+            
+            userInput.value = '';
+        }
+        
+        // Simulated AI responses
+        function getAIResponse(userInput) {
+            userInput = userInput.toLowerCase();
+            
+            if (userInput.includes('help') || userInput.includes('emergency')) {
+                return "I understand you need help. Can you please provide more details about your emergency situation? Is it medical, fire, or security related?";
+            } else if (userInput.includes('fire')) {
+                return "I've detected a fire emergency! Please evacuate the building immediately. I'm alerting the fire department to your location. Stay low to avoid smoke inhalation.";
+            } else if (userInput.includes('medical') || userInput.includes('hurt') || userInput.includes('injured')) {
+                return "I understand this is a medical emergency. I'm locating the nearest hospital and dispatching an ambulance to your current location. Please stay on the line.";
+            } else if (userInput.includes('police') || userInput.includes('theft') || userInput.includes('robbery')) {
+                return "I'm alerting the police to your situation. Please stay in a safe location if possible. Officers are being dispatched to your coordinates.";
+            } else {
+                return "Thank you for providing that information. I'm analyzing your emergency situation and will connect you with the appropriate emergency services. Can you confirm your current location is accurate on the map?";
+            }
+        }
+        
+        // Simulated voice recognition
+        function startVoiceRecognition() {
+            const micAnimation = document.querySelector('.mic-animation');
+            const voiceOutput = document.getElementById('voiceOutput');
+            
+            // Visual feedback
+            micAnimation.style.backgroundColor = '#e63946';
+            micAnimation.style.animation = 'pulse 1s infinite';
+            
+            // Simulate processing
+            voiceOutput.textContent = "Listening...";
+            
+            // Simulate voice recognition (timed)
+            setTimeout(() => {
+                voiceOutput.textContent = "Processing your voice...";
+                
+                setTimeout(() => {
+                    // Simulate AI response
+                    voiceOutput.textContent = "I've detected that you need medical assistance. I'm dispatching an ambulance to your location and alerting the nearest hospital.";
+                    
+                    // Reset animation
+                    micAnimation.style.backgroundColor = '';
+                    micAnimation.style.animation = 'pulse 2s infinite';
+                }, 2000);
+            }, 3000);
+        }
+        
+        // Simulated location detection
+        function detectLocation() {
+            setTimeout(() => {
+                document.getElementById('currentLocation').textContent = "123 Main Street, New Delhi, India";
+                document.getElementById('nearestPolice').textContent = "Delhi Police Station (1.2 km)";
+                document.getElementById('nearestHospital').textContent = "AIIMS Hospital (2.1 km)";
+            }, 3000);
+        }
+        detectLocation();
+        
+        // Simulate emergency call
+        function callEmergency(number) {
+            alert(`Simulating emergency call to ${number}`);
+        }
+        
+        // Face Help Functionality
+        function activateFaceHelp() {
+            const faceScanner = document.getElementById('faceScanner');
+            faceScanner.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size: 64px; color: var(--neon-blue);"></i>';
+            
+            setTimeout(() => {
+                faceScanner.innerHTML = '<i class="fas fa-check-circle" style="font-size: 64px; color: var(--neon-blue);"></i>';
+                
+                setTimeout(() => {
+                    alert("Face scan complete! Emergency contacts located. Sending distress message with your current location and photo.");
+                    faceScanner.innerHTML = '<i class="fas fa-user" style="font-size: 64px; color: var(--neon-blue);"></i>';
+                }, 1000);
+            }, 3000);
+        }
+        
+        // Neural Link Functionality (Ultra-Futuristic)
+        function activateNeuralLink() {
+            alert("Neural-Link activated! The system is now monitoring your brainwave patterns for distress signals.");
+        }
+        
+        // Enter key to send message
+        document.getElementById('userMessage').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
